@@ -1,1 +1,1 @@
-web: /bin/hitradio-mock-api
+web: bin/hitradio-mock-api
