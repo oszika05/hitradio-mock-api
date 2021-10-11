@@ -1,6 +1,9 @@
 package news
 
-import "strings"
+import (
+	"sort"
+	"strings"
+)
 
 type Repository struct {
 	news []News
@@ -55,4 +58,57 @@ func (repo Repository) Get(from int, pageSize int, search string, tags []string)
 	}
 
 	return filteredNews[from:to], nil
+}
+
+func (repo Repository) GetRelated(newsId string) ([]News, bool, error) {
+	newsMap := map[string]News{}
+	relatedNews := map[string]int{}
+	var news News
+
+	for _, n := range repo.news {
+		newsMap[n.Id] = n
+		if n.Id == newsId {
+			news = n
+		}
+	}
+
+	if len(news.Id) == 0 {
+		return []News{}, false, nil
+	}
+
+	for _, n := range repo.news {
+		if n.Id == newsId {
+			continue
+		}
+
+		for _, tag := range n.Tags {
+			for _, originalTag := range news.Tags {
+				if tag == originalTag {
+					relatedNews[n.Id] += 1
+				}
+			}
+		}
+	}
+
+	relatedNewsPairs := make(NewsCountPairList, len(relatedNews))
+	i := 0
+	for k, v := range relatedNews {
+		relatedNewsPairs[i] = NewsCountPair{k, v}
+		i++
+	}
+	sort.Sort(sort.Reverse(relatedNewsPairs))
+
+	to := 10
+
+	if to >= len(relatedNewsPairs) {
+		to = len(relatedNewsPairs)
+	}
+
+	result := make([]News, to)
+	for i = 0; i < to; i++ {
+		result[i] = newsMap[relatedNewsPairs[i].Key]
+	}
+
+	return result, true, nil
+
 }
