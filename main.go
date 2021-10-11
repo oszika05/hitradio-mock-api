@@ -1,8 +1,11 @@
 package main
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
+	"gopkg.in/guregu/null.v4"
 	"hitradio-mock-api/news"
+	"hitradio-mock-api/program"
 	"strconv"
 )
 
@@ -55,10 +58,218 @@ func setupNewsEndpoint(r *gin.Engine) {
 	})
 }
 
+func setupProgramEndpoint(r *gin.Engine) {
+	repo := program.CreateMockRepository()
+
+	r.GET("/program", func(c *gin.Context) {
+
+		fromStr := c.Query("from")
+		pageSizeStr := c.Query("pageSize")
+		searchStr := c.Query("search")
+
+		if len(fromStr) == 0 {
+			fromStr = "0"
+		}
+
+		if len(pageSizeStr) == 0 {
+			pageSizeStr = "15"
+		}
+
+		search := null.StringFrom(searchStr)
+		if len(searchStr) == 0 {
+			search.Valid = false
+		}
+
+		from, err := strconv.ParseInt(fromStr, 10, 32)
+
+		if err != nil {
+			handleErr(c, 400, err)
+			return
+		}
+
+		pageSize, err := strconv.ParseInt(pageSizeStr, 10, 32)
+
+		if err != nil {
+			handleErr(c, 400, err)
+			return
+		}
+
+		programs, err := repo.GetPrograms(int(from), int(pageSize), search)
+
+		if err != nil {
+			handleErr(c, 500, err)
+			return
+		}
+
+		c.JSON(200, programs)
+	})
+
+	r.GET("/program/:id", func(c *gin.Context) {
+
+		id := c.Param("id")
+
+		if len(id) == 0 {
+			handleErr(c, 400, errors.New("No id provided"))
+			return
+		}
+
+		programs, found, err := repo.GetProgram(id)
+
+		if err != nil {
+			handleErr(c, 500, err)
+			return
+		}
+
+		if !found {
+			handleErr(c, 404, errors.New("not found"))
+			return
+		}
+
+		c.JSON(200, programs)
+	})
+
+	r.GET("/episode", func(c *gin.Context) {
+
+		fromStr := c.Query("from")
+		pageSizeStr := c.Query("pageSize")
+		searchStr := c.Query("search")
+		programIdStr := c.Query("programId")
+		tags := c.QueryArray("tag")
+		people := c.QueryArray("person")
+
+		if len(fromStr) == 0 {
+			fromStr = "0"
+		}
+
+		if len(pageSizeStr) == 0 {
+			pageSizeStr = "15"
+		}
+
+		search := null.StringFrom(searchStr)
+		if len(searchStr) == 0 {
+			search.Valid = false
+		}
+
+		programId := null.StringFrom(programIdStr)
+		if len(programIdStr) == 0 {
+			programId.Valid = false
+		}
+
+		from, err := strconv.ParseInt(fromStr, 10, 32)
+
+		if err != nil {
+			handleErr(c, 400, err)
+			return
+		}
+
+		pageSize, err := strconv.ParseInt(pageSizeStr, 10, 32)
+
+		if err != nil {
+			handleErr(c, 400, err)
+			return
+		}
+
+		episodes, err := repo.GetEpisodes(int(from), int(pageSize), programId, search, tags, people)
+
+		if err != nil {
+			handleErr(c, 500, err)
+			return
+		}
+
+		c.JSON(200, episodes)
+	})
+
+	r.GET("/person", func(c *gin.Context) {
+
+		fromStr := c.Query("from")
+		pageSizeStr := c.Query("pageSize")
+		searchStr := c.Query("search")
+		personTypeStr := c.Query("type")
+
+		if len(fromStr) == 0 {
+			fromStr = "0"
+		}
+
+		if len(pageSizeStr) == 0 {
+			pageSizeStr = "15"
+		}
+
+		search := null.StringFrom(searchStr)
+		if len(searchStr) == 0 {
+			search.Valid = false
+		}
+
+		personType := program.PersonType(personTypeStr)
+
+		from, err := strconv.ParseInt(fromStr, 10, 32)
+
+		if err != nil {
+			handleErr(c, 400, err)
+			return
+		}
+
+		pageSize, err := strconv.ParseInt(pageSizeStr, 10, 32)
+
+		if err != nil {
+			handleErr(c, 400, err)
+			return
+		}
+
+		people, err := repo.GetPeople(int(from), int(pageSize), search, personType)
+
+		if err != nil {
+			handleErr(c, 500, err)
+			return
+		}
+
+		c.JSON(200, people)
+	})
+
+	r.GET("/person/:id/related", func(c *gin.Context) {
+
+		personId := c.Param("id")
+
+		people, found, err := repo.GetRelatedPeople(personId)
+
+		if err != nil {
+			handleErr(c, 500, err)
+			return
+		}
+
+		if !found {
+			handleErr(c, 404, errors.New("not found"))
+			return
+		}
+
+		c.JSON(200, people)
+	})
+
+	r.GET("/episode/:id/related", func(c *gin.Context) {
+
+		episodeId := c.Param("id")
+
+		episodes, found, err := repo.GetRelatedEpisodes(episodeId)
+
+		if err != nil {
+			handleErr(c, 500, err)
+			return
+		}
+
+		if !found {
+			handleErr(c, 404, errors.New("not found"))
+			return
+		}
+
+		c.JSON(200, episodes)
+	})
+
+}
+
 func main() {
 	r := gin.Default()
 
 	setupNewsEndpoint(r)
+	setupProgramEndpoint(r)
 
 	r.Run()
 }

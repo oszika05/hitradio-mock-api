@@ -2,7 +2,10 @@ module hitradio-mock-api
 
 go 1.17
 
-require github.com/gin-gonic/gin v1.7.4
+require (
+	github.com/gin-gonic/gin v1.7.4
+	gopkg.in/guregu/null.v4 v4.0.0
+)
 
 require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
