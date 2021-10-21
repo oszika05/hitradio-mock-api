@@ -3,8 +3,8 @@ package program
 import "gopkg.in/guregu/null.v4"
 
 type Program struct {
-	Id          string
-	Name        string
-	Picture     string
-	Description null.String
+	Id          string      `json:"id"`
+	Name        string      `json:"name"`
+	Picture     string      `json:"picture"`
+	Description null.String `json:"description"`
 }

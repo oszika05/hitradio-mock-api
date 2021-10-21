@@ -18,11 +18,3 @@ type Episode struct {
 	Hosts  []Person `json:"hosts"`
 	Guests []Person `json:"guests"`
 }
-
-func (e Episode) Equals(other Episode) bool {
-	return e.Id == other.Id
-}
-
-func (e Episode) NotEquals(other Episode) bool {
-	return e.Id != other.Id
-}
