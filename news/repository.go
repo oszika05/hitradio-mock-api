@@ -112,3 +112,13 @@ func (repo Repository) GetRelated(newsId string) ([]News, bool, error) {
 	return result, true, nil
 
 }
+
+func (repo Repository) GetNewsItem(id string) (News, bool, error) {
+	for _, n := range repo.news {
+		if n.Id == id {
+			return n, true, nil
+		}
+	}
+
+	return News{}, false, nil
+}

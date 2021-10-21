@@ -57,6 +57,25 @@ func setupNewsEndpoint(r *gin.Engine) {
 		c.JSON(200, newsList)
 	})
 
+	r.GET("/news/:id", func(c *gin.Context) {
+
+		newsId := c.Param("id")
+
+		newsItem, found, err := repo.GetNewsItem(newsId)
+
+		if err != nil {
+			handleErr(c, 500, err)
+			return
+		}
+
+		if !found {
+			handleErr(c, 404, errors.New("not found"))
+			return
+		}
+
+		c.JSON(200, newsItem)
+	})
+
 	r.GET("/news/:id/related", func(c *gin.Context) {
 
 		newsId := c.Param("id")
