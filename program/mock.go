@@ -142,7 +142,7 @@ func mockEpisodes() []Episode {
 			Hosts: []Person{
 				person_1,
 			},
-			Guests: nil,
+			Guests: []Person{},
 		},
 		{
 			Id:          "gyujtopont-1",
@@ -242,8 +242,8 @@ func mockEpisodes() []Episode {
 			Tags:        []string{},
 			Program:     program_nyugovora,
 			AudioUrl:    "https://anchor.fm/s/4891e7c0/podcast/play/39752599/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2021-8-3%2F880cefb0-99a9-0771-a1c9-84e09286f844.mp3",
-			Hosts:       nil,
-			Guests:      nil,
+			Hosts:       []Person{},
+			Guests:      []Person{},
 		},
 		{
 			Id:          "nyugovora-2",
@@ -253,8 +253,8 @@ func mockEpisodes() []Episode {
 			Tags:        []string{},
 			Program:     program_nyugovora,
 			AudioUrl:    "https://anchor.fm/s/4891e7c0/podcast/play/39752599/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2021-8-3%2F880cefb0-99a9-0771-a1c9-84e09286f844.mp3",
-			Hosts:       nil,
-			Guests:      nil,
+			Hosts:       []Person{},
+			Guests:      []Person{},
 		},
 		{
 			Id:          "nyugovora-3",
@@ -264,8 +264,8 @@ func mockEpisodes() []Episode {
 			Tags:        []string{},
 			Program:     program_nyugovora,
 			AudioUrl:    "https://anchor.fm/s/4891e7c0/podcast/play/39752599/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2021-8-3%2F880cefb0-99a9-0771-a1c9-84e09286f844.mp3",
-			Hosts:       nil,
-			Guests:      nil,
+			Hosts:       []Person{},
+			Guests:      []Person{},
 		},
 	}
 }
