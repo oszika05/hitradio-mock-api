@@ -114,14 +114,14 @@ func (repo Repository) GetEpisodes(from int, pageSize int, programId null.String
 		personMatch := false
 		for _, searchPerson := range people {
 			for _, episodePerson := range episode.Hosts {
-				if strings.Contains(strings.ToLower(episodePerson.Name), strings.ToLower(searchPerson)) {
+				if episodePerson.Id == searchPerson {
 					personMatch = true
 					break
 				}
 			}
 
 			for _, episodePerson := range episode.Guests {
-				if strings.Contains(strings.ToLower(episodePerson.Name), strings.ToLower(searchPerson)) {
+				if episodePerson.Id == searchPerson {
 					personMatch = true
 					break
 				}
