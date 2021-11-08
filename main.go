@@ -282,11 +282,49 @@ func setupProgramEndpoint(r *gin.Engine) {
 		c.JSON(200, people)
 	})
 
+	r.GET("/person/:id", func(c *gin.Context) {
+
+		personId := c.Param("id")
+
+		people, found, err := repo.GetPerson(personId)
+
+		if err != nil {
+			handleErr(c, 500, err)
+			return
+		}
+
+		if !found {
+			handleErr(c, 404, errors.New("not found"))
+			return
+		}
+
+		c.JSON(200, people)
+	})
+
 	r.GET("/episode/:id/related", func(c *gin.Context) {
 
 		episodeId := c.Param("id")
 
 		episodes, found, err := repo.GetRelatedEpisodes(episodeId)
+
+		if err != nil {
+			handleErr(c, 500, err)
+			return
+		}
+
+		if !found {
+			handleErr(c, 404, errors.New("not found"))
+			return
+		}
+
+		c.JSON(200, episodes)
+	})
+
+	r.GET("/episode/:id", func(c *gin.Context) {
+
+		episodeId := c.Param("id")
+
+		episodes, found, err := repo.GetEpisode(episodeId)
 
 		if err != nil {
 			handleErr(c, 500, err)

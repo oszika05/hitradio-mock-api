@@ -150,6 +150,16 @@ func (repo Repository) GetEpisodes(from int, pageSize int, programId null.String
 	return filtered[from:to], nil
 }
 
+func (repo Repository) GetEpisode(episodeId string) (Episode, bool, error) {
+	for _, episode := range repo.episodes {
+		if episode.Id == episodeId {
+			return episode, true, nil
+		}
+	}
+
+	return Episode{}, false, nil
+}
+
 func (repo Repository) GetPeople(from int, pageSize int, search null.String, personType PersonType) ([]Person, error) {
 	if pageSize == 0 {
 		return []Person{}, nil
@@ -192,6 +202,16 @@ func (repo Repository) GetPeople(from int, pageSize int, search null.String, per
 	}
 
 	return filtered[from:to], nil
+}
+
+func (repo Repository) GetPerson(personId string) (Person, bool, error) {
+	for _, person := range repo.people {
+		if person.Id == personId {
+			return person, true, nil
+		}
+	}
+
+	return Person{}, false, nil
 }
 
 func (repo Repository) GetRelatedPeople(personId string) ([]Person, bool, error) {
