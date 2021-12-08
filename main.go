@@ -316,6 +316,7 @@ func setupProgramEndpoint(r *gin.Engine) {
 		isUserLoggedIn, err := auth.IsUserLoggedIn(context.Background(), token)
 
 		if err != nil {
+			// auth error
 			handleErr(c, 400, err)
 			return
 		}
