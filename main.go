@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/guregu/null.v4"
 	"hitradio-mock-api/auth"
@@ -314,6 +315,8 @@ func setupProgramEndpoint(r *gin.Engine) {
 
 		token := c.GetHeader("token")
 		isUserLoggedIn, err := auth.IsUserLoggedIn(context.Background(), token)
+
+		fmt.Printf("isUserLoggedIn: %v, err: %s", isUserLoggedIn, err.Error())
 
 		if err != nil {
 			handleErr(c, 400, err)
