@@ -7,9 +7,10 @@ import (
 )
 
 type Repository struct {
-	programs []Program
-	episodes []Episode
-	people   []Person
+	programs          []Program
+	episodes          []Episode
+	people            []Person
+	premiumEpisodeIds map[string]bool
 }
 
 func CreateMockRepository() Repository {
@@ -17,6 +18,10 @@ func CreateMockRepository() Repository {
 		programs: mockPrograms(),
 		episodes: mockEpisodes(),
 		people:   mockPerson(),
+		premiumEpisodeIds: map[string]bool{
+			"kozeppont-1": true,
+			"kozeppont-2": true,
+		},
 	}
 }
 
@@ -61,7 +66,7 @@ func (repo Repository) GetProgram(id string) (Program, bool, error) {
 	return Program{}, false, nil
 }
 
-func (repo Repository) GetEpisodes(from int, pageSize int, programId null.String, search null.String, tags []string, people []string) ([]Episode, error) {
+func (repo Repository) GetEpisodes(from int, pageSize int, programId null.String, search null.String, tags []string, people []string, isUserLoggedIn bool) ([]Episode, error) {
 	if pageSize == 0 {
 		return []Episode{}, nil
 	}
@@ -147,12 +152,26 @@ func (repo Repository) GetEpisodes(from int, pageSize int, programId null.String
 		to = len(filtered)
 	}
 
-	return filtered[from:to], nil
+	authFiltered := make([]Episode, len(filtered))
+	for i, item := range filtered {
+		if !isUserLoggedIn && repo.premiumEpisodeIds[filtered[i].Id] {
+			item.AudioUrl = ""
+			authFiltered[i] = item
+		} else {
+			authFiltered[i] = filtered[i]
+		}
+	}
+
+	return authFiltered[from:to], nil
 }
 
-func (repo Repository) GetEpisode(episodeId string) (Episode, bool, error) {
+func (repo Repository) GetEpisode(episodeId string, isUserLoggedIn bool) (Episode, bool, error) {
 	for _, episode := range repo.episodes {
 		if episode.Id == episodeId {
+			if !isUserLoggedIn && repo.premiumEpisodeIds[episode.Id] {
+				episode.AudioUrl = ""
+			}
+
 			return episode, true, nil
 		}
 	}
@@ -289,7 +308,7 @@ func (repo Repository) GetRelatedPeople(personId string) ([]Person, bool, error)
 	return result, true, nil
 }
 
-func (repo Repository) GetRelatedEpisodes(episodeId string) ([]Episode, bool, error) {
+func (repo Repository) GetRelatedEpisodes(episodeId string, isUserLoggedIn bool) ([]Episode, bool, error) {
 	episodes := map[string]Episode{}
 	relatedEpisodes := map[string]int{}
 
@@ -359,5 +378,15 @@ func (repo Repository) GetRelatedEpisodes(episodeId string) ([]Episode, bool, er
 		result[i] = episodes[relatedEpisodePairs[i].Key]
 	}
 
-	return result, true, nil
+	authFiltered := make([]Episode, len(result))
+	for i, item := range result {
+		if !isUserLoggedIn && repo.premiumEpisodeIds[result[i].Id] {
+			item.AudioUrl = ""
+			authFiltered[i] = item
+		} else {
+			authFiltered[i] = result[i]
+		}
+	}
+
+	return authFiltered, true, nil
 }

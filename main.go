@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/guregu/null.v4"
+	"hitradio-mock-api/auth"
 	"hitradio-mock-api/news"
 	"hitradio-mock-api/program"
 	"strconv"
@@ -100,7 +102,6 @@ func setupProgramEndpoint(r *gin.Engine) {
 	repo := program.CreateMockRepository()
 
 	r.GET("/program", func(c *gin.Context) {
-
 		fromStr := c.Query("from")
 		pageSizeStr := c.Query("pageSize")
 		searchStr := c.Query("search")
@@ -168,6 +169,14 @@ func setupProgramEndpoint(r *gin.Engine) {
 
 	r.GET("/episode", func(c *gin.Context) {
 
+		token := c.GetHeader("token")
+		isUserLoggedIn, err := auth.IsUserLoggedIn(context.Background(), token)
+
+		if err != nil {
+			handleErr(c, 400, err)
+			return
+		}
+
 		fromStr := c.Query("from")
 		pageSizeStr := c.Query("pageSize")
 		searchStr := c.Query("search")
@@ -207,7 +216,7 @@ func setupProgramEndpoint(r *gin.Engine) {
 			return
 		}
 
-		episodes, err := repo.GetEpisodes(int(from), int(pageSize), programId, search, tags, people)
+		episodes, err := repo.GetEpisodes(int(from), int(pageSize), programId, search, tags, people, isUserLoggedIn)
 
 		if err != nil {
 			handleErr(c, 500, err)
@@ -303,9 +312,17 @@ func setupProgramEndpoint(r *gin.Engine) {
 
 	r.GET("/episode/:id/related", func(c *gin.Context) {
 
+		token := c.GetHeader("token")
+		isUserLoggedIn, err := auth.IsUserLoggedIn(context.Background(), token)
+
+		if err != nil {
+			handleErr(c, 400, err)
+			return
+		}
+
 		episodeId := c.Param("id")
 
-		episodes, found, err := repo.GetRelatedEpisodes(episodeId)
+		episodes, found, err := repo.GetRelatedEpisodes(episodeId, isUserLoggedIn)
 
 		if err != nil {
 			handleErr(c, 500, err)
@@ -322,9 +339,17 @@ func setupProgramEndpoint(r *gin.Engine) {
 
 	r.GET("/episode/:id", func(c *gin.Context) {
 
+		token := c.GetHeader("token")
+		isUserLoggedIn, err := auth.IsUserLoggedIn(context.Background(), token)
+
+		if err != nil {
+			handleErr(c, 400, err)
+			return
+		}
+
 		episodeId := c.Param("id")
 
-		episodes, found, err := repo.GetEpisode(episodeId)
+		episodes, found, err := repo.GetEpisode(episodeId, isUserLoggedIn)
 
 		if err != nil {
 			handleErr(c, 500, err)
