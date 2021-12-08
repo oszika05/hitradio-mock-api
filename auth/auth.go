@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	firebase "firebase.google.com/go/v4"
+	"fmt"
 )
 
 func IsUserLoggedIn(ctx context.Context, idToken string) (bool, error) {
@@ -21,6 +22,7 @@ func IsUserLoggedIn(ctx context.Context, idToken string) (bool, error) {
 	_, err = a.VerifyIDToken(ctx, idToken)
 
 	if err != nil {
+		fmt.Printf("error in IsUserLoggedIn: %s\n", err.Error())
 		return false, nil
 	}
 
