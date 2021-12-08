@@ -316,7 +316,7 @@ func setupProgramEndpoint(r *gin.Engine) {
 		token := c.GetHeader("token")
 		isUserLoggedIn, err := auth.IsUserLoggedIn(context.Background(), token)
 
-		fmt.Printf("isUserLoggedIn: %v, err: %v\n", isUserLoggedIn, err)
+		fmt.Printf("isUserLoggedIn: %v, token: %s, err: %v\n", isUserLoggedIn, token, err)
 
 		if err != nil {
 			handleErr(c, 400, err)
